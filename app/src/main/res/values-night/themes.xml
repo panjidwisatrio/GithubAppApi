@@ -1,0 +1,133 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Github" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/grey</item>
+        <item name="colorPrimaryVariant">@color/black_700</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
+        <!-- Customize your theme here. -->
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+    </style>
+
+    <style name="Theme.Github.sf" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/grey</item>
+        <item name="colorPrimaryVariant">@color/grey</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
+        <!-- Customize your theme here. -->
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+    </style>
+
+    <style name="Theme.Github.Grey" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/grey</item>
+        <item name="colorPrimaryVariant">@color/black_700</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/grey</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+    </style>
+
+    <style name="Theme.Github.text">
+        <item name="android:layout_width">110dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">30sp</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/black_700</item>
+    </style>
+
+    <style name="Theme.Github.toolBar">
+        <item name="android:background">@color/grey</item>
+    </style>
+
+    <style name="Theme.Github.viewPager">
+        <item name="android:background">@color/black</item>
+    </style>
+
+    <style name="Theme.Github.fab">
+        <item name="android:backgroundTint">@color/black_700</item>
+        <item name="android:src">@drawable/ic_favorite_white</item>
+    </style>
+
+    <style name="Theme.Github.searchview">
+        <item name="searchIcon">@drawable/ic_baseline_search_24</item>
+        <item name="background">@drawable/bg_searchbar_black</item>
+    </style>
+
+    <style name="Theme.Github.ic_github">
+        <item name="android:src">@drawable/ic_github_text_detail</item>
+    </style>
+
+    <style name="Theme.Github.ic_github_detail">
+        <item name="android:src">@drawable/ic_github_text</item>
+    </style>
+
+    <style name="Theme.Github.splash">
+        <item name="android:src">@drawable/ic_github</item>
+    </style>
+
+    <style name="Theme.Github.page_detail">
+        <item name="android:background">@color/black_700</item>
+    </style>
+
+    <style name="Theme.Github.text_detail">
+        <item name="android:textColor">@color/grey</item>
+    </style>
+
+    <style name="Theme.Github.text_detail_followers">
+        <item name="android:textColor">@color/grey</item>
+        <item name="drawableStartCompat">@drawable/ic_baseline_person</item>
+    </style>
+
+    <style name="Theme.Github.text_detail_following">
+        <item name="android:textColor">@color/grey</item>
+        <item name="drawableStartCompat">@drawable/ic_baseline_person_add_alt</item>
+    </style>
+
+    <style name="Theme.Github.text_detail_repository">
+        <item name="android:textColor">@color/grey</item>
+        <item name="drawableStartCompat">@drawable/ic_baseline_book</item>
+    </style>
+
+    <style name="Theme.Github.containerSearch">
+        <item name="android:background">@drawable/bg_searchbar_black</item>
+    </style>
+
+    <style name="Theme.Github.placeholder_main">
+        <item name="android:src">@drawable/ic_people_search</item>
+    </style>
+
+    <style name="Theme.Github.placeholder_main_text">
+        <item name="android:textColor">@color/grey</item>
+    </style>
+
+    <style name="Theme.Github.placeholder_favorite">
+        <item name="android:src">@drawable/ic_favorite_half</item>
+    </style>
+
+    <style name="Theme.Github.NoActionBarAndStatusBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+    </style>
+</resources>

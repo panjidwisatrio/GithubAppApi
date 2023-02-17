@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:outlineSpotShadowColor="@color/black_700"
+    android:outlineAmbientShadowColor="@color/black_700"
+    android:elevation="4dp"
+    android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
+    tools:targetApi="p">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/topAppBarMain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Theme.Github.toolBar">
+
+        <ImageView
+            android:id="@+id/ic_github"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            style="@style/Theme.Github.ic_github"
+            android:contentDescription="@string/logo_github"/>
+
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        style="@style/Theme.Github.toolBar"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="11dp"
+            style="@style/Theme.Github.containerSearch"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textCursorDrawable="@null"
+                app:iconifiedByDefault="false"
+                style="@style/Theme.Github.searchview"
+                app:queryBackground="@null"
+                app:queryHint="Search"
+                app:showDividers="end" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.appbar.AppBarLayout>

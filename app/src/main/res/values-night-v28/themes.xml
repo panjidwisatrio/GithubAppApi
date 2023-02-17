@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Github.appBar">
+        <item name="android:outlineSpotShadowColor">@color/grey</item>
+        <item name="android:outlineAmbientShadowColor">@color/grey</item>
+    </style>
+
+    <style name="Theme.Github.appBar_detail">
+        <item name="android:outlineSpotShadowColor">@color/black_700</item>
+        <item name="android:outlineAmbientShadowColor">@color/black_700</item>
+    </style>
+</resources>
