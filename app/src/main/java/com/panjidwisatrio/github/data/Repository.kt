@@ -17,6 +17,7 @@ class Repository(application: Application) {
     private val retrofit: ApiService = RetrofitService.create()
     private val dao: UserDao
     private val dataStore: UserDataStore
+    // inisialisasi job
     private var job: Job? = null
 
     init {
@@ -30,23 +31,29 @@ class Repository(application: Application) {
 
         // inisialisasi liveData
         val listUser = MutableLiveData<Resource<List<User>>>()
+        // inisialisasi exceptionHandler
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             listUser.postValue(Resource.Error(throwable.message))
         }
 
         // set liveData menjadi loading
         listUser.postValue(Resource.Loading())
-        // mengambil data dari api
+        // membuat coroutine untuk mengambil data dari api
         job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
+            // memanggil fungsi searchUsers() pada retrofit
             val response = retrofit.searchUsers(query)
+            // cek apakah response berhasil
             if (response.isSuccessful) {
-                if (response.body()?.items?.isEmpty() == true) {
+                // cek apakah data yang diambil kosong
+                if (response.body()?.items.isNullOrEmpty()) {
                     listUser.postValue(Resource.Error("User not found"))
-                } else {
+                } else { // jika tidak kosong
                     listUser.postValue(Resource.Success(response.body()?.items))
                 }
             } else {
-                if (response.code() == 403) {
+                if (response.code() == 401) { // cek kode response error
+                    listUser.postValue(Resource.Error("Unauthorized"))
+                } else if (response.code() == 403) {
                     listUser.postValue(Resource.Error("API limit exceeded"))
                 } else if (response.code() == 422) {
                     listUser.postValue(Resource.Error("Query parameter is missing"))
@@ -114,13 +121,15 @@ class Repository(application: Application) {
         job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
             val response = retrofit.getUserFollowing(username)
             if (response.isSuccessful) {
-                if (response.body()?.isEmpty() == true) {
+                if (response.body().isNullOrEmpty()) {
                     listUser.postValue(Resource.Error(null))
                 } else {
                     listUser.postValue(Resource.Success(response.body()))
                 }
             } else {
-                if (response.code() == 403) {
+                if(response.code() == 401) {
+                    listUser.postValue(Resource.Error("Unauthorized"))
+                } else if (response.code() == 403) {
                     listUser.postValue(Resource.Error("API limit exceeded"))
                 } else if (response.code() == 422) {
                     listUser.postValue(Resource.Error("Query parameter is missing"))
@@ -145,13 +154,15 @@ class Repository(application: Application) {
         job = CoroutineScope(Dispatchers.IO).launch {
             val response = retrofit.getUserFollowers(username)
             if (response.isSuccessful) {
-                if (response.body()?.isEmpty() == true) {
+                if (response.body().isNullOrEmpty()) {
                     listUser.postValue(Resource.Error(null))
                 } else {
                     listUser.postValue(Resource.Success(response.body()))
                 }
             } else {
-                if (response.code() == 403) {
+                if(response.code() == 401) {
+                    listUser.postValue(Resource.Error("Unauthorized"))
+                } else if (response.code() == 403) {
                     listUser.postValue(Resource.Error("API limit exceeded"))
                 } else if (response.code() == 422) {
                     listUser.postValue(Resource.Error("Query parameter is missing"))

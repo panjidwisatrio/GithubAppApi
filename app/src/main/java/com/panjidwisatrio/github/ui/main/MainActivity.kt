@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
         setSupportActionBar(binding.toolbar.topAppBarMain)
         // set title action bar menjadi null
         supportActionBar?.title = null
-
         // inisialisasi adapter
         searchAdapter = SearchAdapter()
 
@@ -76,8 +75,9 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
 
                 // ketika text pada searchView berubah
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    // menampilkan placeholder
+                    // menghapus list pada adapter
                     searchAdapter.submitList(emptyList())
+                    // menampilkan placeholder
                     with(binding) {
                         placeholderImg.apply {
                             viewModel.getThemeSetting().observe(this@MainActivity) { isDarkModeActive ->
@@ -125,11 +125,11 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
         // mengubah icon menu sesuai dengan tema yang dipilih
         viewModel.getThemeSetting().observe(this) { isDarkModeActive ->
             if (isDarkModeActive) {
-                menu.getItem(0)?.setIcon(R.drawable.ic_baseline_favorite_24)
-                menu.getItem(1)?.setIcon(R.drawable.ic_baseline_settings_24)
-            } else {
                 menu.getItem(0)?.setIcon(R.drawable.ic_favorite_black)
                 menu.getItem(1)?.setIcon(R.drawable.ic_baseline_settings_black)
+            } else {
+                menu.getItem(0)?.setIcon(R.drawable.ic_baseline_favorite_24)
+                menu.getItem(1)?.setIcon(R.drawable.ic_baseline_settings_24)
             }
         }
 
@@ -163,6 +163,7 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
 
     // implementasi method onSuccess dari ViewStateCallback
     override fun onSuccess(data: List<User>) {
+        // mengirimkan data ke adapter
         searchAdapter.submitList(data)
         // menampilkan recyclerview dan menghilangkan placeholder
         with(binding) {

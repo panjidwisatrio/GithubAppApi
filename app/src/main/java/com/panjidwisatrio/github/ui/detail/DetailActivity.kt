@@ -39,9 +39,9 @@ class DetailActivity : AppCompatActivity(), ViewStateCallback<User> {
         // set theme dari shared preference ke activity
         viewModel.getThemeSetting().observe(this) { isDarkModeActive ->
             if (isDarkModeActive) {
-                supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_black)
-            } else {
                 supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_white)
+            } else {
+                supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_black)
             }
         }
 
@@ -129,9 +129,9 @@ class DetailActivity : AppCompatActivity(), ViewStateCallback<User> {
             viewModel.getThemeSetting().observe(this@DetailActivity) { isDarkModeActive ->
                 // mengubah warna fab button favorite sesuai dengan theme yang dipilih
                 unChecked = if (isDarkModeActive) {
-                    ColorStateList.valueOf(Color.rgb(36, 41, 47))
-                } else {
                     ColorStateList.valueOf(Color.WHITE)
+                } else {
+                    ColorStateList.valueOf(Color.rgb(36, 41, 47))
                 }
 
                 // mengecek apakah user yang sedang dilihat sudah di favorite atau belum

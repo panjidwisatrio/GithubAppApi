@@ -16,11 +16,14 @@ class SearchAdapter : ListAdapter<User, SearchAdapter.ViewHolder>(DIFF_UTIL) {
 
     // DONE: Membuat DiffUtil untuk mengecek perubahan data pada RecyclerView
     companion object {
+        // membuat object DiffUtil
         private val DIFF_UTIL = object : DiffUtil.ItemCallback<User>() {
+            // mengecek apakah item sama atau tidak
             override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
                 return oldItem.username == newItem.username
             }
 
+            // mengecek apakah konten item sama atau tidak
             override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
                 return oldItem == newItem
             }

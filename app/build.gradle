@@ -16,7 +16,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "KEY", '"token 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"')
+        buildConfigField("String", "KEY", '"token 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"')
     }
 
     buildTypes {
