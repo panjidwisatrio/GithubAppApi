@@ -1,7 +1,6 @@
 package com.panjidwisatrio.github.ui.adapter
 
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -15,16 +14,14 @@ import com.panjidwisatrio.github.util.Constanta.EXTRA_USER
 
 class SearchAdapter : ListAdapter<User, SearchAdapter.ViewHolder>(DIFF_UTIL) {
 
-    // TODO: 1/10/2021 - Data berhasil diambil namun tidak bisa di tampilkan ke recyclerview (force close)
+    // DONE: Membuat DiffUtil untuk mengecek perubahan data pada RecyclerView
     companion object {
         private val DIFF_UTIL = object : DiffUtil.ItemCallback<User>() {
             override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
-                Log.d("SearchAdapter", "areItemsTheSame: ${oldItem.username} == ${newItem.username}")
                 return oldItem.username == newItem.username
             }
 
             override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
-                Log.d("SearchAdapter", "areContentsTheSame: ${oldItem.username} == ${newItem.username}")
                 return oldItem == newItem
             }
         }
@@ -70,7 +67,4 @@ class SearchAdapter : ListAdapter<User, SearchAdapter.ViewHolder>(DIFF_UTIL) {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder) {
         bind(getItem(position))
     }
-
-    // mengembalikan jumlah item pada RecyclerView
-    override fun getItemCount(): Int = currentList.size
 }

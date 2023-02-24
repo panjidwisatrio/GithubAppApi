@@ -4,7 +4,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import androidx.activity.viewModels
 import com.bumptech.glide.Glide
@@ -21,7 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class DetailActivity : AppCompatActivity(), ViewStateCallback<User?> {
+class DetailActivity : AppCompatActivity(), ViewStateCallback<User> {
     // inisialisasi binding dan viewmodel
     private lateinit var binding: ActivityDetailBinding
     private val viewModel by viewModels<DetailViewModel>()
@@ -40,9 +39,9 @@ class DetailActivity : AppCompatActivity(), ViewStateCallback<User?> {
         // set theme dari shared preference ke activity
         viewModel.getThemeSetting().observe(this) { isDarkModeActive ->
             if (isDarkModeActive) {
-                supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_white)
-            } else {
                 supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_black)
+            } else {
+                supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_white)
             }
         }
 
@@ -54,16 +53,16 @@ class DetailActivity : AppCompatActivity(), ViewStateCallback<User?> {
     }
 
     // method untuk mengambil data user dari api dengan coroutine melalui viewmodel
-    private fun getUserWithCoroutine(username: String?) {
-        // menjalankan kode secara asinkronus di dalam thread utama.
+    private fun getUserWithCoroutine(username: String) {
+        // menjalankan kode secara asynchronous di dalam thread utama.
         CoroutineScope(Dispatchers.Main).launch {
             // mengamati data dari viewmodel dengan memanggil method getDetailUser
-            viewModel.getDetailUser(username.toString()).observe(this@DetailActivity) {
+            viewModel.getDetailUser(username).observe(this@DetailActivity) {
                 // mengecek apakah data yang didapat adalah error, loading, atau success
                 when (it) {
                     is Resource.Error -> onFailed(it.message)
                     is Resource.Loading -> onLoading()
-                    is Resource.Success -> onSuccess(it.data)
+                    is Resource.Success -> it.data?.let { it1 -> onSuccess(it1) }
                     else -> {}
                 }
             }
@@ -84,31 +83,43 @@ class DetailActivity : AppCompatActivity(), ViewStateCallback<User?> {
                 tabs.text = resources.getString(TAB_TITLES[position])
             }.attach()
         }
-
-        Log.d("DetailActivity", "setTabLayout: $username")
     }
 
-    override fun onSuccess(data: User?) {
-        Log.d("DetailActivity", "onSuccess: $data")
+    override fun onSuccess(data: User) {
         binding.apply {
+            progressBarDetail?.visibility = invisible
+            container.visibility = visible
+            fabFav.visibility = visible
+            placeholderImg?.visibility = invisible
+            placeholderText?.visibility = invisible
+            tabs.visibility = visible
+            followerDetail.visibility = visible
+            followingDetail.visibility = visible
+            repoDetail.visibility = visible
+
             Glide.with(this@DetailActivity)
-                .load(data?.avatar)
+                .load(data.avatar)
                 .into(ivAvatar)
+            ivAvatar.visibility = visible
 
-            tvUsername.text = data?.username.toString()
+            tvUsername.text = data.username.toString()
+            tvUsername.visibility = visible
 
-            if (data?.name == null) tvName.text = "-"
+            if (data.name == null) tvName.text = "-"
             else tvName.text = data.name.toString()
+            tvName.visibility = visible
 
-            if (data?.company == null) tvCompany.text = getString(R.string.not_added_company)
+            if (data.company == null) tvCompany.text = getString(R.string.not_added_company)
             else tvCompany.text = data.company.toString()
+            tvCompany.visibility = visible
 
-            if (data?.location == null) tvLocation.text = getString(R.string.not_added_location)
+            if (data.location == null) tvLocation.text = getString(R.string.not_added_location)
             else tvLocation.text = data.location.toString()
+            tvLocation.visibility = visible
 
-            repoDetail.text = data?.repository.toString()
-            followerDetail.text = data?.follower.toString()
-            followingDetail.text = data?.following.toString()
+            repoDetail.text = data.repository.toString()
+            followerDetail.text = data.follower.toString()
+            followingDetail.text = data.following.toString()
 
             // inisialisasi warna fab button favorite
             val checked: ColorStateList = ColorStateList.valueOf(Color.RED)
@@ -118,29 +129,29 @@ class DetailActivity : AppCompatActivity(), ViewStateCallback<User?> {
             viewModel.getThemeSetting().observe(this@DetailActivity) { isDarkModeActive ->
                 // mengubah warna fab button favorite sesuai dengan theme yang dipilih
                 unChecked = if (isDarkModeActive) {
-                    ColorStateList.valueOf(Color.WHITE)
-                } else {
                     ColorStateList.valueOf(Color.rgb(36, 41, 47))
+                } else {
+                    ColorStateList.valueOf(Color.WHITE)
                 }
 
                 // mengecek apakah user yang sedang dilihat sudah di favorite atau belum
-                if (data?.isFavorite == true) fabFav.imageTintList = checked
+                if (data.isFavorite) fabFav.imageTintList = checked
                 else fabFav.imageTintList = unChecked
             }
 
             // menambahkan listener pada fab button favorite
             fabFav.setOnClickListener {
                 // mengecek apakah user yang sedang dilihat sudah di favorite atau belum
-                // TODO: 1/10/2021 - == true bisa dihilangkan
-                if (data?.isFavorite == true) {
+                // DONE: 1/10/2021 - == true bisa dihilangkan
+                if (data.isFavorite) {
                     // jika sudah di favorite, maka akan dihapus dari favorite
                     data.isFavorite = false
                     viewModel.deleteFavorite(data)
                     fabFav.imageTintList = unChecked
                 } else {
                     // jika belum di favorite, maka akan ditambahkan ke favorite
-                    data?.isFavorite = true
-                    data?.let { it1 -> viewModel.insertFavorite(it1) }
+                    data.isFavorite = true
+                    data.let { it1 -> viewModel.insertFavorite(it1) }
                     fabFav.imageTintList = checked
                 }
             }
@@ -148,11 +159,43 @@ class DetailActivity : AppCompatActivity(), ViewStateCallback<User?> {
     }
 
     override fun onLoading() {
-        binding.fabFav.visibility = invisible
+        with(binding) {
+            followerDetail.visibility = invisible
+            followingDetail.visibility = invisible
+            repoDetail.visibility = invisible
+            tvCompany.visibility = invisible
+            tvLocation.visibility = invisible
+            tvName.visibility = invisible
+            tvUsername.visibility = invisible
+            ivAvatar.visibility = invisible
+            progressBarDetail?.visibility = visible
+            container.visibility = invisible
+            fabFav.visibility = invisible
+            placeholderImg?.visibility = invisible
+            placeholderText?.visibility = invisible
+            tabs.visibility = invisible
+        }
     }
 
     override fun onFailed(message: String?) {
-        binding.fabFav.visibility = invisible
+        with(binding) {
+            followerDetail.visibility = invisible
+            followingDetail.visibility = invisible
+            repoDetail.visibility = invisible
+            tvCompany.visibility = invisible
+            tvLocation.visibility = invisible
+            tvName.visibility = invisible
+            tvUsername.visibility = invisible
+            ivAvatar.visibility = invisible
+            progressBarDetail?.visibility = invisible
+            container.visibility = invisible
+            fabFav.visibility = invisible
+            placeholderImg?.visibility = visible
+            if (message != null) placeholderText?.text = message
+            else placeholderText?.text = getString(R.string.something_went_wrong)
+            placeholderText?.visibility = visible
+            tabs.visibility = invisible
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

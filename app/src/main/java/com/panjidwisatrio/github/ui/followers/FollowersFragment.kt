@@ -1,7 +1,6 @@
 package com.panjidwisatrio.github.ui.followers
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -56,13 +55,12 @@ class FollowersFragment : Fragment(), ViewStateCallback<List<User>> {
     }
 
     private fun getUserFollowers(username: String) {
-        viewModel.getUserFollowers(username).observe(viewLifecycleOwner) {
-            when (it) {
-                is Resource.Error -> onFailed(it.message)
-                is Resource.Loading -> onLoading()
-                is Resource.Success -> it.data?.let { it1 ->
-                    onSuccess(it1)
-                    searchAdapter.submitList(it1)
+        CoroutineScope(Dispatchers.Main).launch {
+            viewModel.getUserFollowers(username).observe(viewLifecycleOwner) {
+                when (it) {
+                    is Resource.Error -> onFailed(it.message)
+                    is Resource.Loading -> onLoading()
+                    is Resource.Success -> it.data?.let { it1 -> onSuccess(it1) }
                 }
             }
         }
@@ -77,6 +75,7 @@ class FollowersFragment : Fragment(), ViewStateCallback<List<User>> {
     }
 
     override fun onSuccess(data: List<User>) {
+        searchAdapter.submitList(data)
         binding.apply {
             rvListUser.visibility = visible
             followersTextPlaceholder.visibility = invisible

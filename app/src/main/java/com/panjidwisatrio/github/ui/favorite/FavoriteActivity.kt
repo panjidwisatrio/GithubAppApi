@@ -114,7 +114,10 @@ class FavoriteActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
                 when (it) {
                     is Resource.Error -> onFailed(it.message)
                     is Resource.Loading -> onLoading()
-                    is Resource.Success -> it.data?.let { it1 -> onSuccess(it1) }
+                    is Resource.Success -> it.data?.let { it1 ->
+                        onSuccess(it1)
+                        searchAdapter.submitList(it1)
+                    }
                 }
             }
         }

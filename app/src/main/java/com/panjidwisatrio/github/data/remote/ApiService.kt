@@ -2,7 +2,7 @@ package com.panjidwisatrio.github.data.remote
 
 import com.panjidwisatrio.github.model.Search
 import com.panjidwisatrio.github.model.User
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -11,27 +11,27 @@ import retrofit2.http.Query
 interface ApiService {
     // Membuat fungsi untuk mengambil data user
     @GET("search/users")
-    fun searchUsers (
+    suspend fun searchUsers (
         // Membuat parameter untuk mengirimkan query pencarian
         @Query("q")
         query: String
-    ): Call<Search> // Membuat objek Call dengan tipe data Search
+    ): Response<Search>
 
     @GET("users/{username}")
-    fun getDetailUser (
+    suspend fun getDetailUser (
         @Path("username")
         username: String
-    ): Call<User>
+    ): Response<User>
 
     @GET("users/{username}/followers")
-    fun getUserFollowers (
+    suspend fun getUserFollowers (
         @Path("username")
         username: String
-    ): Call<List<User>>
+    ): Response<List<User>>
 
     @GET("users/{username}/following")
-    fun getUserFollowing (
+    suspend fun getUserFollowing (
         @Path("username")
         username: String
-    ): Call<List<User>>
+    ): Response<List<User>>
 }

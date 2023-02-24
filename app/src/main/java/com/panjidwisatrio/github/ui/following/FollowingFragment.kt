@@ -1,7 +1,6 @@
 package com.panjidwisatrio.github.ui.following
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -50,13 +49,12 @@ class FollowingFragment :
     }
 
     private fun getUserFollowing(username: String) {
-        viewModel.getUserFollowing(username).observe(viewLifecycleOwner) {
-            when (it) {
-                is Resource.Error -> onFailed(it.message)
-                is Resource.Loading -> onLoading()
-                is Resource.Success -> it.data?.let { it1 ->
-                    onSuccess(it1)
-                    searchAdapter.submitList(it1)
+        CoroutineScope(Dispatchers.Main).launch {
+            viewModel.getUserFollowing(username).observe(viewLifecycleOwner) {
+                when (it) {
+                    is Resource.Error -> onFailed(it.message)
+                    is Resource.Loading -> onLoading()
+                    is Resource.Success -> it.data?.let { it1 -> onSuccess(it1) }
                 }
             }
         }
@@ -70,7 +68,7 @@ class FollowingFragment :
     }
 
     override fun onSuccess(data: List<User>) {
-        Log.d("FollowingFragment", "onSuccess: $data")
+        searchAdapter.submitList(data)
         binding.apply {
             rvListUser.visibility = visible
             progressBarFollowing.visibility = invisible

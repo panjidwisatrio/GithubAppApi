@@ -17,6 +17,9 @@ import com.panjidwisatrio.github.ui.adapter.SearchAdapter
 import com.panjidwisatrio.github.ui.favorite.FavoriteActivity
 import com.panjidwisatrio.github.ui.setting.SettingActivity
 import com.panjidwisatrio.github.util.ViewStateCallback
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
 
@@ -51,7 +54,7 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
     private fun searchUser() {
         binding.toolbar.search.apply {
             // implementasi listener pada searchView
-            setOnQueryTextListener(object: SearchView.OnQueryTextListener,
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener,
                 androidx.appcompat.widget.SearchView.OnQueryTextListener {
                 // ketika tombol search atau enter ditekan
                 override fun onQueryTextSubmit(query: String?): Boolean {
@@ -59,13 +62,12 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
                     // menghilangkan keyboard
                     clearFocus()
                     // memanggil method searchUser pada viewModel
-                    viewModel.searchUser(userQuery).observe(this@MainActivity) {
-                        when(it) {
-                            is Resource.Error -> onFailed(it.message)
-                            is Resource.Loading -> onLoading()
-                            is Resource.Success -> it.data?.let { it1 ->
-                                onSuccess(it1)
-                                searchAdapter.submitList(it1)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        viewModel.searchUser(userQuery).observe(this@MainActivity) {
+                            when (it) {
+                                is Resource.Error -> onFailed(it.message)
+                                is Resource.Loading -> onLoading()
+                                is Resource.Success -> it.data?.let { it1 -> onSuccess(it1) }
                             }
                         }
                     }
@@ -75,9 +77,16 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
                 // ketika text pada searchView berubah
                 override fun onQueryTextChange(newText: String?): Boolean {
                     // menampilkan placeholder
-                    onSuccess(emptyList())
+                    searchAdapter.submitList(emptyList())
                     with(binding) {
                         placeholderImg.apply {
+                            viewModel.getThemeSetting().observe(this@MainActivity) { isDarkModeActive ->
+                                if (isDarkModeActive) {
+                                    setImageResource(R.drawable.ic_people_search)
+                                } else {
+                                    setImageResource(R.drawable.ic_people_search_black)
+                                }
+                            }
                             visibility = visible
                         }
 
@@ -116,11 +125,11 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
         // mengubah icon menu sesuai dengan tema yang dipilih
         viewModel.getThemeSetting().observe(this) { isDarkModeActive ->
             if (isDarkModeActive) {
-                menu.getItem(0)?.setIcon(R.drawable.ic_favorite_black)
-                menu.getItem(1)?.setIcon(R.drawable.ic_baseline_settings_black)
-            } else {
                 menu.getItem(0)?.setIcon(R.drawable.ic_baseline_favorite_24)
                 menu.getItem(1)?.setIcon(R.drawable.ic_baseline_settings_24)
+            } else {
+                menu.getItem(0)?.setIcon(R.drawable.ic_favorite_black)
+                menu.getItem(1)?.setIcon(R.drawable.ic_baseline_settings_black)
             }
         }
 
@@ -129,7 +138,7 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
 
     // onOptionsItemSelected digunakan untuk menangani aksi ketika menu pada action bar ditekan
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId) {
+        return when (item.itemId) {
             R.id.favorite -> {
                 // berpindah ke activity FavoriteActivity
                 startActivity(
@@ -154,6 +163,7 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
 
     // implementasi method onSuccess dari ViewStateCallback
     override fun onSuccess(data: List<User>) {
+        searchAdapter.submitList(data)
         // menampilkan recyclerview dan menghilangkan placeholder
         with(binding) {
             rvListUser.visibility = visible
@@ -178,13 +188,15 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
     override fun onFailed(message: String?) {
         // menampilkan placeholder dan menghilangkan recyclerview dan progressbar
         with(binding) {
+            progressBar.visibility = invisible
+            rvListUser.visibility = invisible
             // jika message null, maka akan menampilkan placeholder default
             if (message == null) {
                 placeholderImg.apply {
                     // mengubah icon placeholder sesuai dengan tema yang dipilih
                     viewModel.getThemeSetting().observe(this@MainActivity) { isDarkModeActive ->
                         if (isDarkModeActive) {
-                            setImageResource(R.drawable.ic_search_not_found_black)
+                            setImageResource(R.drawable.ic_search_not_found)
                         } else {
                             setImageResource(R.drawable.ic_search_not_found_black)
                         }
@@ -204,6 +216,15 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
             } else {
                 // jika message tidak null, maka akan menampilkan placeholder sesuai dengan message
                 placeholderImg.apply {
+                    // mengubah icon placeholder sesuai dengan tema yang dipilih
+                    viewModel.getThemeSetting().observe(this@MainActivity) { isDarkModeActive ->
+                        if (isDarkModeActive) {
+                            setImageResource(R.drawable.ic_search_not_found)
+                        } else {
+                            setImageResource(R.drawable.ic_search_not_found_black)
+                        }
+                    }
+
                     visibility = visible
                 }
 
@@ -212,8 +233,6 @@ class MainActivity : AppCompatActivity(), ViewStateCallback<List<User>> {
                     visibility = visible
                 }
             }
-            progressBar.visibility = invisible
-            rvListUser.visibility = invisible
         }
     }
 }

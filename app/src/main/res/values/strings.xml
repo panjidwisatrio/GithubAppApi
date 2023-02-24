@@ -27,4 +27,5 @@
     <string name="tidak_mengikuti_siapapun">Tidak Mengikuti Siapapun</string>
     <string name="have_not_add_favorite">Kamu belum memiliki favorite</string>
     <string name="when_have_not_favorite">when have not favorite</string>
+    <string name="something_went_wrong">Something went wrong!</string>
 </resources>

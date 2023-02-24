@@ -5,13 +5,6 @@ import com.panjidwisatrio.github.BuildConfig
 import com.panjidwisatrio.github.R
 
 object Constanta {
-
-    // waktu splash screen dalam milisecond
-    const val TIME_SPLASH = 2000L
-
-    // key untuk intent dari splash screen ke main activity
-    const val SPLASH_SCREEN = "splash_screen"
-
     // key untuk intent dari antar activity atau fragment
     const val EXTRA_USER = "EXTRA_USER"
 

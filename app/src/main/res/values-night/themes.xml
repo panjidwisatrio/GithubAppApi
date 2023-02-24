@@ -79,8 +79,13 @@
         <item name="android:src">@drawable/ic_github_text</item>
     </style>
 
-    <style name="Theme.Github.splash">
-        <item name="android:src">@drawable/ic_github</item>
+    <style name="Theme.Github.splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background_dark</item>
+        <item name="android:colorPrimary">@color/black_500</item>
+        <item name="android:colorPrimaryDark">@color/black_700</item>
+        <item name="android:colorAccent">@color/black</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
     </style>
 
     <style name="Theme.Github.page_detail">
@@ -112,6 +117,10 @@
 
     <style name="Theme.Github.placeholder_main">
         <item name="android:src">@drawable/ic_people_search</item>
+    </style>
+
+    <style name="Theme.Github.placeholder_detail">
+        <item name="android:src">@drawable/ic_error</item>
     </style>
 
     <style name="Theme.Github.placeholder_main_text">

@@ -22,11 +22,6 @@ class SettingActivity : AppCompatActivity() {
         supportActionBar?.title = null
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // set theme setting from shared preferences to switch button and set theme mode to dark or light mode
-        binding.swNightMode.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.saveThemeSetting(isChecked)
-        }
-
         // mengubah tema dari aplikasi sesuai dengan settingan yang disimpan di shared preferences
         viewModel.getThemeSetting().observe(this) { isDarkModeActive ->
             if (isDarkModeActive) {
@@ -40,6 +35,11 @@ class SettingActivity : AppCompatActivity() {
                 supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_white)
                 binding.swNightMode.isChecked = false
             }
+        }
+
+        // set theme setting from shared preferences to switch button and set theme mode to dark or light mode
+        binding.swNightMode.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.saveThemeSetting(isChecked)
         }
     }
 

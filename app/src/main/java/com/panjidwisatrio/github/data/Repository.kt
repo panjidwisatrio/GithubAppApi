@@ -9,53 +9,54 @@ import com.panjidwisatrio.github.data.local.UserDatabase
 import com.panjidwisatrio.github.data.local.UserDatabase.Companion.getInstance
 import com.panjidwisatrio.github.data.remote.ApiService
 import com.panjidwisatrio.github.data.remote.RetrofitService
-import com.panjidwisatrio.github.model.Search
 import com.panjidwisatrio.github.model.User
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.*
 
 class Repository(application: Application) {
     // inisialisasi retrofit, dao, dan dataStore
     private val retrofit: ApiService = RetrofitService.create()
     private val dao: UserDao
     private val dataStore: UserDataStore
+    private var job: Job? = null
 
     init {
         val database: UserDatabase = getInstance(application)
-        dao = database.userDao()
         dataStore = UserDataStore.getInstance(application)
+        dao = database.userDao()
     }
 
     // fungsi untuk mengambil data dari api
-    fun searchUser(query: String): LiveData<Resource<List<User>>> {
+    suspend fun searchUser(query: String): LiveData<Resource<List<User>>> {
 
         // inisialisasi liveData
         val listUser = MutableLiveData<Resource<List<User>>>()
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            listUser.postValue(Resource.Error(throwable.message))
+        }
 
         // set liveData menjadi loading
         listUser.postValue(Resource.Loading())
         // mengambil data dari api
-        retrofit.searchUsers(query).enqueue(object : Callback<Search> {
-            override fun onResponse(
-                call: Call<Search>, response: Response<Search>
-            ) {
-                // mengambil data dari response
-                val list = response.body()?.items
-
-                if (list.isNullOrEmpty())
-                    // jika data kosong maka liveData akan menjadi error
-                    listUser.postValue(Resource.Error(null))
-                else
-                    // jika data tidak kosong maka liveData akan menjadi success
-                    listUser.postValue(Resource.Success(list))
+        job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
+            val response = retrofit.searchUsers(query)
+            if (response.isSuccessful) {
+                if (response.body()?.items?.isEmpty() == true) {
+                    listUser.postValue(Resource.Error("User not found"))
+                } else {
+                    listUser.postValue(Resource.Success(response.body()?.items))
+                }
+            } else {
+                if (response.code() == 403) {
+                    listUser.postValue(Resource.Error("API limit exceeded"))
+                } else if (response.code() == 422) {
+                    listUser.postValue(Resource.Error("Query parameter is missing"))
+                } else if (response.code() == 500) {
+                    listUser.postValue(Resource.Error("Internal server error"))
+                } else {
+                    listUser.postValue(Resource.Error(response.message()))
+                }
             }
-
-            override fun onFailure(call: Call<Search>, t: Throwable) {
-                listUser.postValue(Resource.Error(t.message))
-            }
-
-        })
+        }
 
         // mengembalikan liveData yang sudah di set
         return listUser
@@ -66,6 +67,12 @@ class Repository(application: Application) {
 
         // inisialisasi liveData
         val user = MutableLiveData<Resource<User>>()
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            user.postValue(Resource.Error(throwable.message))
+        }
+
+        // set liveData menjadi loading
+        user.postValue(Resource.Loading())
 
         // cek apakah data sudah ada di database
         if (dao.getFavoriteDetailUser(username) != null) {
@@ -73,19 +80,22 @@ class Repository(application: Application) {
             user.postValue(Resource.Success(dao.getFavoriteDetailUser(username)))
         } else {
             // jika tidak ada, maka akan mengambil data dari api
-            retrofit.getDetailUser(username).enqueue(object : Callback<User> {
-                override fun onResponse(call: Call<User>, response: Response<User>) {
-                    // mengambil data dari response
-                    val result = response.body()
-                    // jika data tidak kosong maka liveData akan menjadi success
-                    user.postValue(Resource.Success(result))
+            job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
+                val response = retrofit.getDetailUser(username)
+                if (response.isSuccessful) {
+                    user.postValue(Resource.Success(response.body()))
+                } else {
+                    if (response.code() == 403) {
+                        user.postValue(Resource.Error("API limit exceeded"))
+                    } else if (response.code() == 422) {
+                        user.postValue(Resource.Error("Query parameter is missing"))
+                    } else if (response.code() == 500) {
+                        user.postValue(Resource.Error("Internal server error"))
+                    } else {
+                        user.postValue(Resource.Error(response.message()))
+                    }
                 }
-
-                override fun onFailure(call: Call<User>, t: Throwable) {
-                    // jika data kosong maka liveData akan menjadi error
-                    user.postValue(Resource.Error(t.message))
-                }
-            })
+            }
         }
 
         // mengembalikan liveData yang sudah di set
@@ -93,43 +103,65 @@ class Repository(application: Application) {
     }
 
     // fungsi untuk mengambil data dari api
-    fun getUserFollowing(username: String): LiveData<Resource<List<User>>> {
+    suspend fun getUserFollowing(username: String): LiveData<Resource<List<User>>> {
 
         val listUser = MutableLiveData<Resource<List<User>>>()
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            listUser.postValue(Resource.Error(throwable.message))
+        }
 
         listUser.postValue(Resource.Loading())
-        retrofit.getUserFollowing(username).enqueue(object : Callback<List<User>> {
-            override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
-                val list = response.body()
-                if (list.isNullOrEmpty()) listUser.postValue(Resource.Error(null))
-                else listUser.postValue(Resource.Success(list))
+        job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
+            val response = retrofit.getUserFollowing(username)
+            if (response.isSuccessful) {
+                if (response.body()?.isEmpty() == true) {
+                    listUser.postValue(Resource.Error(null))
+                } else {
+                    listUser.postValue(Resource.Success(response.body()))
+                }
+            } else {
+                if (response.code() == 403) {
+                    listUser.postValue(Resource.Error("API limit exceeded"))
+                } else if (response.code() == 422) {
+                    listUser.postValue(Resource.Error("Query parameter is missing"))
+                } else if (response.code() == 500) {
+                    listUser.postValue(Resource.Error("Internal server error"))
+                } else {
+                    listUser.postValue(Resource.Error(response.message()))
+                }
             }
+        }
 
-            override fun onFailure(call: Call<List<User>>, t: Throwable) {
-                listUser.postValue(Resource.Error(t.message))
-            }
-        })
         return listUser
     }
 
     // fungsi untuk mengambil data dari api
-    fun getUserFollowers(username: String): LiveData<Resource<List<User>>> {
+    suspend fun getUserFollowers(username: String): LiveData<Resource<List<User>>> {
 
         val listUser = MutableLiveData<Resource<List<User>>>()
 
         listUser.postValue(Resource.Loading())
-        // TODO: 10/10/2021 - Coroutines
-        retrofit.getUserFollowers(username).enqueue(object : Callback<List<User>> {
-            override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
-                val list = response.body()
-                if (list.isNullOrEmpty()) listUser.postValue(Resource.Error(null))
-                else listUser.postValue(Resource.Success(list))
+        // DONE: 10/10/2021 - Coroutines
+        job = CoroutineScope(Dispatchers.IO).launch {
+            val response = retrofit.getUserFollowers(username)
+            if (response.isSuccessful) {
+                if (response.body()?.isEmpty() == true) {
+                    listUser.postValue(Resource.Error(null))
+                } else {
+                    listUser.postValue(Resource.Success(response.body()))
+                }
+            } else {
+                if (response.code() == 403) {
+                    listUser.postValue(Resource.Error("API limit exceeded"))
+                } else if (response.code() == 422) {
+                    listUser.postValue(Resource.Error("Query parameter is missing"))
+                } else if (response.code() == 500) {
+                    listUser.postValue(Resource.Error("Internal server error"))
+                } else {
+                    listUser.postValue(Resource.Error(response.message()))
+                }
             }
-
-            override fun onFailure(call: Call<List<User>>, t: Throwable) {
-                listUser.postValue(Resource.Error(t.message))
-            }
-        })
+        }
 
         return listUser
     }

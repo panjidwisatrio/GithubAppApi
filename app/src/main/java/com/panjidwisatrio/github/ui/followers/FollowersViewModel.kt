@@ -6,6 +6,5 @@ import com.panjidwisatrio.github.data.Repository
 
 class FollowersViewModel(application: Application): AndroidViewModel(application) {
     private val repository = Repository(application)
-
-    fun getUserFollowers(username: String) = repository.getUserFollowers(username)
+    suspend fun getUserFollowers(username: String) = repository.getUserFollowers(username)
 }

@@ -12,7 +12,7 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
     private val repository = Repository(application)
 
     // mengambil data dari repository dan mengembalikan ke view
-    fun searchUser(query: String) = repository.searchUser(query)
+    suspend fun searchUser(query: String) = repository.searchUser(query)
     // mengambil data dari repository dan mengembalikan ke view
     fun getThemeSetting() = repository.getThemeSetting().asLiveData(Dispatchers.IO)
 }

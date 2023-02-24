@@ -39,6 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/cari_pengguna"
+        android:textAlignment="center"
         android:textSize="20sp"
         android:fontFamily="@font/sf_compact_semibold"
         style="@style/Theme.Github.placeholder_main_text"
